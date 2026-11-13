@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     double pemasukan, pengeluaran;
 
     do {
-        printf("\n=== APLIKASI PENCATAT KEUANGAN PRIBADI ===\n");
+        printf("\n== APLIKASI PENCATAT KEUANGAN PRIBADI ==\n");
         printf("1. Tambah Transaksi\n");
         printf("2. Lihat Riwayat Transaksi\n");
         printf("3. Cari Transaksi (Kategori/Tipe)\n");
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 3: {
                 char keyword[30];
-                printf("Masukkan Kategori/Tipe yang dicari: ");
+                printf("Tolong masukkan Kategori/Tipe yang dicari: ");
                 scanf("%s", keyword);
                 cariTransaksi(dbFile, keyword);
                 break;
