@@ -78,9 +78,9 @@ void eksporKeTeks(const char *filenameBinary, const char *filenameTeks) {
         return;
     }
 
-    fprintf(txtFile, "========================================\n");
+    fprintf(txtFile, "=======================================\n");
     fprintf(txtFile, "      LAPORAN KEUANGAN BULANAN          \n");
-    fprintf(txtFile, "========================================\n");
+    fprintf(txtFile, "=======================================\n");
     
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, binFile) == 1) {
         fprintf(txtFile, "[%s] %s - %s: Rp%.2f (Tgl: %s)\n", 
