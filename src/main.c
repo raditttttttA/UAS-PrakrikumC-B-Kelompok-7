@@ -1,7 +1,7 @@
 #include "../include/fitur.h"
 
 void tampilkanBantuan() {
-    printf("\n=== BANTUAN PENGGUNAAN APLIKASI KEUANGAN ===\n");
+    printf("\n BANTUAN PENGGUNAAN APLIKASI KEUANGAN \n");
     printf("1. Jalankan interaktif : ./program\n");
     printf("2. Lihat bantuan       : ./program --help\n");
 }
