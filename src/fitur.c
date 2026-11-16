@@ -112,3 +112,51 @@ void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *tota
     }
     fclose(file);
 }
+
+// Menghitung ID terakhir + 1 agar ID tetap otomatis
+int dapatkanIdBerikutnya(const char *filename) {
+    CatatanKeuangan transaksi;
+    FILE *file = fopen(filename, "rb");
+    int maxId = 0;
+
+    if (!file) {
+        return 1;
+    }
+
+    while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
+        if (transaksi.id > maxId) {
+            maxId = transaksi.id;
+        }
+    }
+    fclose(file);
+    return maxId + 1;
+}
+
+// Quick add (./program --tambah)
+void quickAddTransaksi(const char *filename, const char *tanggal, const char *kategori, const char *tipe, double nominal) {
+    CatatanKeuangan transaksi;
+    FILE *file = fopen(filename, "ab");
+    if (!file) {
+        printf("Gagal membuka file database!\n");
+        return;
+    }
+
+    transaksi.id = dapatkanIdBerikutnya(filename);
+    strncpy(transaksi.tanggal, tanggal, sizeof(transaksi.tanggal) - 1);
+    transaksi.tanggal[sizeof(transaksi.tanggal) - 1] = '\0';
+    strncpy(transaksi.kategori, kategori, sizeof(transaksi.kategori) - 1);
+    transaksi.kategori[sizeof(transaksi.kategori) - 1] = '\0';
+    strncpy(transaksi.tipe, tipe, sizeof(transaksi.tipe) - 1);
+    transaksi.tipe[sizeof(transaksi.tipe) - 1] = '\0';
+    transaksi.nominal = nominal;
+
+    fwrite(&transaksi, sizeof(CatatanKeuangan), 1, file);
+    fclose(file);
+
+    printf("\n[SUKSES] Transaksi berhasil ditambahkan secara cepat!\n");
+    printf("ID       : %d\n", transaksi.id);
+    printf("Tanggal  : %s\n", transaksi.tanggal);
+    printf("Kategori : %s\n", transaksi.kategori);
+    printf("Tipe     : %s\n", transaksi.tipe);
+    printf("Nominal  : Rp%.2f\n\n", transaksi.nominal);
+}
