@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../include/fitur.h"
 
 void tampilkanBantuan() {
@@ -17,6 +20,9 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(argv[1], "--cari") == 0 && argc > 2) {
             cariTransaksi(dbFile, argv[2]);
             return 0;
+        } else {
+            printf("Argumen tidak valid! Gunakan --help untuk bantuan.\n");
+            return 1;
         }
     }
 
@@ -32,7 +38,11 @@ int main(int argc, char *argv[]) {
         printf("5. Ekspor Laporan ke Teks (.txt)\n");
         printf("6. Keluar\n");
         printf("Pilihan Anda: ");
-        scanf("%d", &pilihan);
+        if (scanf("%d", &pilihan) != 1) {
+            printf("[ERROR] Masukkan angka pilihan yang valid!\n");
+            while(getchar() != '\n'); // Clear buffer
+            continue;
+        }
 
         switch (pilihan) {
             case 1:
@@ -50,6 +60,7 @@ int main(int argc, char *argv[]) {
             }
             case 4:
                 hitungSaldoTotal(dbFile, &pemasukan, &pengeluaran);
+                printf("\n--- RINGKASAN SALDO ---\n");
                 printf("\nTotal Pemasukan  : Rp%.2f\n", pemasukan);
                 printf("\nTotal Pengeluaran: Rp%.2f\n", pengeluaran);
                 printf("Saldo Bersih     : Rp%.2f\n", pemasukan - pengeluaran);
