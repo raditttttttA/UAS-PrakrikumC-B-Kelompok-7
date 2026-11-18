@@ -1,5 +1,10 @@
 #include "../include/fitur.h"
 
+// Fungsi internal untuk memastikan folder 'data/' ada secara otomatis
+static void pastikanFolderAda() {
+    MKDIR("data");
+}
+
 void tambahTransaksi(const char *filename) {
     CatatanKeuangan transaksi;
     FILE *file = fopen(filename, "ab"); // Mode append binary
@@ -7,18 +12,38 @@ void tambahTransaksi(const char *filename) {
         printf("Gagal membuka file database!\n");
         return;
     }
+    transaksi.id = dapatkanIdBerikutnya(filename);
 
-    printf("\n=== TAMBAH TRANSAKSI BARU ===\n");
-    printf("Masukkan ID (angka): ");
-    scanf("%d", &transaksi.id);
+    printf("\n=== TAMBAH TRANSAKSI BARU (Auto ID: #%d) ===\n", transaksi.id);    
+    
     printf("Masukkan Tanggal (YYYY-MM-DD): ");
-    scanf("%s", transaksi.tanggal);
+    scanf("%14s", transaksi.tanggal);
+    
+    int pilihanTipe;
+    printf("Pilih Tipe Transaksi:\n  1. Pemasukan\n  2. Pengeluaran\nPilihan (1/2): ");
+    if (scanf("%d", &pilihanTipe) != 1) {
+        printf("[ERROR] Input tidak valid!\n");
+        while (getchar() != '\n'); // Bersihkan buffer
+        fclose(file);
+        return;
+    }
+    
+    if (pilihanTipe == 1) {
+        strcpy(transaksi.tipe, "Pemasukan");
+    } else {
+        strcpy(transaksi.tipe, "Pengeluaran");
+    }
+
     printf("Masukkan Kategori (cth: Makanan/Gaji): ");
-    scanf("%s", transaksi.kategori);
-    printf("Masukkan Tipe (Pemasukan/Pengeluaran): ");
-    scanf("%s", transaksi.tipe);
-    printf("Masukkan Nominal: ");
-    scanf("%lf", &transaksi.nominal);
+    scanf("%29s", transaksi.kategori);
+    
+    printf("Masukkan Nominal (Rp): ");
+    if (scanf("%lf", &transaksi.nominal) != 1 || transaksi.nominal <= 0) {
+        printf("[ERROR] Nominal harus berupa angka positif!\n");
+        while (getchar() != '\n'); // Bersihkan buffer
+        fclose(file);
+        return;
+    }
 
     fwrite(&transaksi, sizeof(CatatanKeuangan), 1, file);
     fclose(file);
