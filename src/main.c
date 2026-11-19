@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h> 
 #include "../include/fitur.h"
 
 void tampilkanBantuan() {
@@ -20,7 +21,27 @@ int main(int argc, char *argv[]) {
         } else if (strcmp(argv[1], "--cari") == 0 && argc > 2) {
             cariTransaksi(dbFile, argv[2]);
             return 0;
-        } else {
+        } else if (strcmp(argv[1], "--tambah") == 0) {
+            if (argc != 5) {
+                printf("[ERROR] Format argumen kurang lengkap!\n");
+                printf("Gunakan: %s --tambah <Pemasukan/Pengeluaran> <Kategori> <Nominal>\n", argv[0]);
+                return 1;
+            }
+            // Mengambil tanggal hari ini secara otomatis untuk quick-add
+            char tglHariIni[15];
+            time_t t = time(NULL);
+            struct tm tm = *localtime(&t);
+            sprintf(tglHariIni, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+
+            double nominalInput = atof(argv[4]);
+            if (nominalInput <= 0) {
+                printf("[ERROR] Nominal harus berupa angka positif yang valid!\n");
+                return 1;
+            }
+            quickAddTransaksi(dbFile, tglHariIni, argv[3], argv[2], nominalInput);
+            return 0;
+        } 
+        else {
             printf("Argumen tidak valid! Gunakan --help untuk bantuan.\n");
             return 1;
         }

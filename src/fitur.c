@@ -54,18 +54,22 @@ void tampilkanRiwayat(const char *filename) {
     CatatanKeuangan transaksi;
     FILE *file = fopen(filename, "rb"); 
     if (!file) {
-        printf("\nBelum ada data transaksi atau file belum dibuat.\n");
+        printf("\n [INFO]Belum ada data transaksi atau file belum dibuat.\n");
         return;
     }
 
-    printf("\n=========================================================\n");
-    printf(" ID | Tanggal    | Kategori       | Tipe        | Nominal   \n");
-    printf("=========================================================\n");
+    printf("\n=====================================================================\n");
+    printf("| %-4s | %-12s | %-15s | %-13s | %-14s |\n", "ID", "Tanggal", "Kategori", "Tipe", "Nominal");
+    printf("=====================================================================\n");
+    
+    int count = 0;
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
-        printf(" %-3d| %-10s | %-14s | %-11s | Rp%.2f\n", 
+        printf("| %-4d | %-12s | %-15s | %-13s | Rp%12.2f |\n", 
                transaksi.id, transaksi.tanggal, transaksi.kategori, transaksi.tipe, transaksi.nominal);
+        count++;
     }
-    printf("=========================================================\n");
+    printf("=====================================================================\n");
+    printf("Total data ditampilkan: %d transaksi.\n", count);
     fclose(file);
 }
 
@@ -75,45 +79,77 @@ void cariTransaksi(const char *filename, const char *keyword) {
     int ditemukan = 0;
 
     if (!file) {
-        printf("Database tidak ditemukan.\n");
+        printf("[INFO] Database tidak ditemukan.\n");
         return;
     }
 
-    printf("\n=== HASIL PENCARIAN: '%s' ===\n", keyword);
+    printf("\n=== HASIL PENCARIAN DENGAN KATA KUNCI: '%s' ===\n", keyword);
+    printf("=====================================================================\n");
+    printf("| %-4s | %-12s | %-15s | %-13s | %-14s |\n", "ID", "Tanggal", "Kategori", "Tipe", "Nominal");
+    printf("=====================================================================\n");
+
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
-        if (strcmp(transaksi.kategori, keyword) == 0 || strcmp(transaksi.tipe, keyword) == 0) {
-            printf("ID: %d | Tanggal: %s | %s | Rp%.2f\n", 
-                   transaksi.id, transaksi.tanggal, transaksi.kategori, transaksi.nominal);
-            ditemukan = 1;
+        // Pencarian aman (case-insensitive atau pencocokan string kategori/tipe)
+        if (strcasestr(transaksi.kategori, keyword) != NULL || strcasestr(transaksi.tipe, keyword) != NULL) {
+            printf("| %-4d | %-12s | %-15s | %-13s | Rp%12.2f |\n", 
+                   transaksi.id, transaksi.tanggal, transaksi.kategori, transaksi.tipe, transaksi.nominal);
+            ditemukan++;
         }
     }
-    if (!ditemukan) printf("Tidak ada data yang cocok.\n");
+    printf("=====================================================================\n");
+    if (!ditemukan) {
+        printf("[INFO] Tidak ada data yang cocok dengan '%s'.\n", keyword);
+    } else {
+        printf("Ditemukan %d data yang cocok.\n", ditemukan);
+    }
     fclose(file);
 }
 
 void eksporKeTeks(const char *filenameBinary, const char *filenameTeks) {
+    pastikanFolderAda(); // Pastikan folder data ada
     CatatanKeuangan transaksi;
     FILE *binFile = fopen(filenameBinary, "rb");
-    FILE *txtFile = fopen(filenameTeks, "w");
+    if (!binFile) {
+        printf("[ERROR] Gagal membuka file database binary untuk diekspor.\n");
+        return;
+    }
 
-    if (!binFile || !txtFile) {
-        printf("Gagal membuka file untuk ekspor laporan.\n");
-        if (binFile) fclose(binFile);
-        if (txtFile) fclose(txtFile);
+    FILE *txtFile = fopen(filenameTeks, "w");
+    if (!txtFile) {
+        printf("[ERROR] Gagal membuat file laporan teks (%s).\n", filenameTeks);
+        fclose(binFile);
         return;
     }
 
     fprintf(txtFile, "=======================================\n");
     fprintf(txtFile, "      LAPORAN KEUANGAN BULANAN          \n");
     fprintf(txtFile, "=======================================\n");
+    fprintf(txtFile, "%-4s | %-12s | %-15s | %-12s | %-12s\n", "ID", "Tanggal", "Kategori", "Tipe", "Nominal");
+    fprintf(txtFile, "---------------------------------------------------------\n");
     
+    double totalMasuk = 0, totalKeluar = 0;
+    int count = 0;
+
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, binFile) == 1) {
-        fprintf(txtFile, "[%s] %s - %s: Rp%.2f (Tgl: %s)\n", 
-                transaksi.tipe, transaksi.kategori, transaksi.tipe, transaksi.nominal, transaksi.tanggal);
+        fprintf(txtFile, "%-4d | %-12s | %-15s | %-12s | Rp%.2f\n", 
+                transaksi.id, transaksi.tanggal, transaksi.kategori, transaksi.tipe, transaksi.nominal);
+        
+        if (strcasecmp(transaksi.tipe, "Pemasukan") == 0) {
+            totalMasuk += transaksi.nominal;
+        } else {
+            totalKeluar += transaksi.nominal;
+        }
+        count++;
     }
 
-    fprintf(txtFile, "========================================\n");
-    printf("Berhasil mengekspor laporan ke %s!\n", filenameTeks);
+    fprintf(txtFile, "---------------------------------------------------------\n");
+    fprintf(txtFile, "Total Transaksi   : %d\n", count);
+    fprintf(txtFile, "Total Pemasukan   : Rp%.2f\n", totalMasuk);
+    fprintf(txtFile, "Total Pengeluaran : Rp%.2f\n", totalKeluar);
+    fprintf(txtFile, "Saldo Akhir       : Rp%.2f\n", totalMasuk - totalKeluar);
+    fprintf(txtFile, "=========================================================\n");
+
+    printf("[SUKSES] Berhasil mengekspor laporan ke %s!\n", filenameTeks);
 
     fclose(binFile);
     fclose(txtFile);
@@ -129,9 +165,9 @@ void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *tota
     if (!file) return;
 
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
-        if (strcmp(transaksi.tipe, "Pemasukan") == 0) {
+        if (strcasecmp(transaksi.tipe, "Pemasukan") == 0) {
             *totalPemasukan += transaksi.nominal;
-        } else if (strcmp(transaksi.tipe, "Pengeluaran") == 0) {
+        } else if (strcasecmp(transaksi.tipe, "Pengeluaran") == 0) {
             *totalPengeluaran += transaksi.nominal;
         }
     }
@@ -167,12 +203,20 @@ void quickAddTransaksi(const char *filename, const char *tanggal, const char *ka
     }
 
     transaksi.id = dapatkanIdBerikutnya(filename);
+
+    // Validasi aman panjang string (mencegah buffer overflow)
     strncpy(transaksi.tanggal, tanggal, sizeof(transaksi.tanggal) - 1);
     transaksi.tanggal[sizeof(transaksi.tanggal) - 1] = '\0';
+    
     strncpy(transaksi.kategori, kategori, sizeof(transaksi.kategori) - 1);
     transaksi.kategori[sizeof(transaksi.kategori) - 1] = '\0';
-    strncpy(transaksi.tipe, tipe, sizeof(transaksi.tipe) - 1);
-    transaksi.tipe[sizeof(transaksi.tipe) - 1] = '\0';
+    
+    if (strcasecmp(tipe, "pemasukan") == 0) {
+        strcpy(transaksi.tipe, "Pemasukan");
+    } else {
+        strcpy(transaksi.tipe, "Pengeluaran");
+    }
+    
     transaksi.nominal = nominal;
 
     fwrite(&transaksi, sizeof(CatatanKeuangan), 1, file);
