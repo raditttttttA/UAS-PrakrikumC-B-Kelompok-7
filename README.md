@@ -44,10 +44,10 @@ Mode argumen CLI:
 ./program.exe --help
 
 - Cari transaksi:
-./program.exe --cari Makanan
+./program.exe --cari <kategori/tipe>
 
 - Tambah cepat:
-./program.exe --tambah 2026-11-16 Makanan Pengeluaran 25000
+./program.exe --tambah <YYYY-MM-DD> <Kategori> <Tipe> <Nominal>
 
 Contoh Output Program
 
