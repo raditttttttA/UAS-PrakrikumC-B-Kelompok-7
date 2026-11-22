@@ -7,9 +7,9 @@
 void tampilkanBantuan() {
     printf("\n=== BANTUAN PENGGUNAAN APLIKASI KEUANGAN ===\n");
     printf("1. Jalankan interaktif : ./program\n");
-    printf("2. Tambah cepat      : ./program --tambah <Pemasukan/Pengeluaran> <Kategori> <Nominal>\n");
-    printf("3. Cari transaksi    : ./program --cari <kategori/tipe>\n");
-    printf("4. Lihat bantuan      : ./program --help\n");
+    printf("2. Tambah cepat        : ./program --tambah <Pemasukan/Pengeluaran> <Kategori> <Nominal>\n");
+    printf("3. Cari transaksi      : ./program --cari <kategori/tipe>\n");
+    printf("4. Lihat bantuan       : ./program --help\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -42,8 +42,7 @@ int main(int argc, char *argv[]) {
             }
             quickAddTransaksi(dbFile, tglHariIni, argv[3], argv[2], nominalInput);
             return 0;
-        } 
-        else {
+        } else {
             printf("Argumen tidak valid! Gunakan --help untuk bantuan.\n");
             return 1;
         }
@@ -53,7 +52,7 @@ int main(int argc, char *argv[]) {
     double pemasukan, pengeluaran;
 
     do {
-        printf("\n== APLIKASI PENCATAT KEUANGAN PRIBADI ==\n");
+        printf("\n=== APLIKASI PENCATAT KEUANGAN PRIBADI ===\n");
         printf("1. Tambah Transaksi\n");
         printf("2. Lihat Riwayat Transaksi\n");
         printf("3. Cari Transaksi (Kategori/Tipe)\n");
@@ -76,7 +75,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 3: {
                 char keyword[30];
-                printf("Tolong masukkan Kategori/Tipe yang dicari: ");
+                printf("Masukkan Kategori/Tipe yang dicari: ");
                 scanf("%s", keyword);
                 cariTransaksi(dbFile, keyword);
                 break;
@@ -95,7 +94,7 @@ int main(int argc, char *argv[]) {
                 printf("Terima kasih telah menggunakan aplikasi ini!\n");
                 break;
             default:
-                printf("Pilihan tidak valid!\n");
+                printf("[ERROR] Pilihan tidak valid!\n");
         }
     } while (pilihan != 6);
 

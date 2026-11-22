@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
-#include <time.h> 
+#include <ctype.h>
+#include <time.h>
 
 typedef struct {
     int id;

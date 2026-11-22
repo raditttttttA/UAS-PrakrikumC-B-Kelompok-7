@@ -212,18 +212,27 @@ void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *tota
     CatatanKeuangan transaksi;
     FILE *file = fopen(filename, "rb");
     
+    // Inisialisasi total pemasukan dan pengeluaran ke 0
     *totalPemasukan = 0;
     *totalPengeluaran = 0;
 
-    if (!file) return;
+    if (!file) {
+        printf("Belum ada data keuangan atau file belum dibuat.\n");
+        return;
+    }
 
+    // Baca data transaksi satu per satu
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
-        if (strcasecmp(transaksi.tipe, "Pemasukan") == 0) {
+        // Cek jika tipe adalah pemasukan (tidak sensitif huruf besar/kecil)
+        if (strcasecmp(transaksi.tipe, "Pemasukan") == 0 || strstr(transaksi.tipe, "masuk") != NULL) {
             *totalPemasukan += transaksi.nominal;
-        } else if (strcasecmp(transaksi.tipe, "Pengeluaran") == 0) {
+        } 
+        // Cek jika tipe adalah pengeluaran (tidak sensitif huruf besar/kecil)
+        else if (strcasecmp(transaksi.tipe, "Pengeluaran") == 0 || strstr(transaksi.tipe, "keluar") != NULL) {
             *totalPengeluaran += transaksi.nominal;
         }
     }
+
     fclose(file);
 }
 

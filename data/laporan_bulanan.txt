@@ -1,0 +1,10 @@
+=======================================
+      LAPORAN KEUANGAN BULANAN          
+=======================================
+[pwmasukan] gaji - pwmasukan: Rp10000.00 (Tgl: 1222-22-22)
+[pemasukan] kucing - pemasukan: Rp2000000.00 (Tgl: 2021-12-22)
+[pengeluaran] makanan - pengeluaran: Rp23222.00 (Tgl: 2010-11-12)
+[pemasukan] makanan - pemasukan: Rp2000000.00 (Tgl: 2026-12-11)
+[pemasukan] gaji - pemasukan: Rp200000000.00 (Tgl: 2025-11-12)
+[pemasukan] gaji - pemasukan: Rp2010203.00 (Tgl: 2026-11-12)
+========================================
