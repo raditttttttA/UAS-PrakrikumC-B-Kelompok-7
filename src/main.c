@@ -4,6 +4,9 @@ void tampilkanBantuan() {
     printf("\n BANTUAN PENGGUNAAN APLIKASI KEUANGAN \n");
     printf("1. Jalankan interaktif : ./program\n");
     printf("2. Lihat bantuan       : ./program --help\n");
+    printf("3. Cari transaksi      : ./program --cari <kategori/tipe>\n");
+    printf("4. Tambah cepat        : ./program --tambah <tanggal> <kategori> <tipe> <nominal>\n");
+    printf("   Contoh: ./program --tambah 2026-11-16 Makanan Pengeluaran 25000\n\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -16,6 +19,16 @@ int main(int argc, char *argv[]) {
             return 0;
         } else if (strcmp(argv[1], "--cari") == 0 && argc > 2) {
             cariTransaksi(dbFile, argv[2]);
+            return 0;
+        } else if (strcmp(argv[1], "--tambah") == 0) {
+            if (argc < 6) {
+                printf("\nFormat salah! Gunakan:\n");
+                printf("./program --tambah <tanggal> <kategori> <tipe> <nominal>\n");
+                printf("Contoh: ./program --tambah 2026-11-16 Makanan Pengeluaran 25000\n\n");
+                return 1;
+            }
+            double nominal = atof(argv[5]);
+            quickAddTransaksi(dbFile, argv[2], argv[3], argv[4], nominal);
             return 0;
         }
     }
@@ -50,8 +63,9 @@ int main(int argc, char *argv[]) {
             }
             case 4:
                 hitungSaldoTotal(dbFile, &pemasukan, &pengeluaran);
-                printf("\nTotal Pemasukan  : Rp%.2f\n", pemasukan);
-                printf("\nTotal Pengeluaran: Rp%.2f\n", pengeluaran);
+                printf("\n--- RINGKASAN SALDO ---\n");
+                printf("Total Pemasukan  : Rp%.2f\n", pemasukan);
+                printf("Total Pengeluaran: Rp%.2f\n", pengeluaran);
                 printf("Saldo Bersih     : Rp%.2f\n", pemasukan - pengeluaran);
                 break;
             case 5:
