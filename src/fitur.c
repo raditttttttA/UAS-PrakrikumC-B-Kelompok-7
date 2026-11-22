@@ -37,23 +37,12 @@ static void pastikanFolderAda() {
     MKDIR("data");
 }
 
-// Fungsi manipulasi struct CatatanKeuangan menggunakan pointer (->)
+// Fungsi sederhana mengisi data struct lewat pointer (->)
 void isiDataTransaksi(CatatanKeuangan *t, int id, const char *tanggal, const char *kategori, const char *tipe, double nominal) {
     t->id = id;
-
-    // Salin string dengan batas buffer aman
-    strncpy(t->tanggal, tanggal, sizeof(t->tanggal) - 1);
-    t->tanggal[sizeof(t->tanggal) - 1] = '\0';
-
-    strncpy(t->kategori, kategori, sizeof(t->kategori) - 1);
-    t->kategori[sizeof(t->kategori) - 1] = '\0';
-
-    if (strcasecmp(tipe, "pemasukan") == 0 || strstr(tipe, "masuk") != NULL) {
-        strcpy(t->tipe, "Pemasukan");
-    } else {
-        strcpy(t->tipe, "Pengeluaran");
-    }
-
+    strcpy(t->tanggal, tanggal);
+    strcpy(t->kategori, kategori);
+    strcpy(t->tipe, tipe);
     t->nominal = nominal;
 }
 
