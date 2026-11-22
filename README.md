@@ -1,6 +1,6 @@
 Proyek UAS Praktikum Pemrograman - Aplikasi Catatan Keuangan
 
-Proyek ini dibuat untuk tugas akhir UAS Praktikum Pemrograman Komputer (Kelas B - Kelompok 7). Aplikasi ini adalah program pencatat keuangan sederhana berbasis terminal (CLI) menggunakan bahasa C, dengan penyimpanan data ke file binary dan fitur ekspor ke file teks.
+Proyek ini dibuat untuk tugas akhir UAS Praktikum Pemrograman (Kelas B - Kelompok 7). Aplikasi ini adalah program pencatat keuangan sederhana berbasis terminal (CLI) menggunakan bahasa C, dengan penyimpanan data ke file binary dan fitur ekspor ke file teks.
 
 Anggota Kelompok 7
 1. Ahmad Faiz Nuzuli - 260810701100042
