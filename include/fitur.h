@@ -6,6 +6,7 @@
 #include <string.h>
 #include <strings.h>
 #include <ctype.h>
+#include <time.h>
 
 typedef struct {
     int id;
@@ -20,7 +21,6 @@ void tampilkanRiwayat(const char *filename);
 void cariTransaksi(const char *filename, const char *keyword);
 void eksporKeTeks(const char *filenameBinary, const char *filenameTeks);
 void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *totalPengeluaran);
-
 int dapatkanIdBerikutnya(const char *filename);
 void quickAddTransaksi(const char *filename, const char *tanggal, const char *kategori, const char *tipe, double nominal);
 
