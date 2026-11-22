@@ -36,8 +36,8 @@ gcc src/main.c src/fitur.c -Iinclude -o program.exe
 
 
 2. Cara Menjalankan Program
-Mode interaktif:
-./program.exe
+
+./program.exe atau klik program.exe 2x
 
 Mode argumen CLI:
 - Melihat bantuan:
