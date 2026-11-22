@@ -30,10 +30,10 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
             // Mengambil tanggal hari ini secara otomatis untuk quick-add
-            char tglHariIni[15];
+            char tglHariIni[40];
             time_t t = time(NULL);
             struct tm tm = *localtime(&t);
-            sprintf(tglHariIni, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+            snprintf(tglHariIni, sizeof(tglHariIni), "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 
             double nominalInput = atof(argv[4]);
             if (nominalInput <= 0) {
