@@ -5,9 +5,11 @@
 #include "../include/fitur.h"
 
 void tampilkanBantuan() {
-    printf("\n BANTUAN PENGGUNAAN APLIKASI KEUANGAN \n");
+    printf("\n=== BANTUAN PENGGUNAAN APLIKASI KEUANGAN ===\n");
     printf("1. Jalankan interaktif : ./program\n");
-    printf("2. Lihat bantuan       : ./program --help\n");
+    printf("2. Tambah cepat      : ./program --tambah <Pemasukan/Pengeluaran> <Kategori> <Nominal>\n");
+    printf("3. Cari transaksi    : ./program --cari <kategori/tipe>\n");
+    printf("4. Lihat bantuan      : ./program --help\n");
 }
 
 int main(int argc, char *argv[]) {
@@ -82,8 +84,8 @@ int main(int argc, char *argv[]) {
             case 4:
                 hitungSaldoTotal(dbFile, &pemasukan, &pengeluaran);
                 printf("\n--- RINGKASAN SALDO ---\n");
-                printf("\nTotal Pemasukan  : Rp%.2f\n", pemasukan);
-                printf("\nTotal Pengeluaran: Rp%.2f\n", pengeluaran);
+                printf("Total Pemasukan  : Rp%.2f\n", pemasukan);
+                printf("Total Pengeluaran: Rp%.2f\n", pengeluaran);
                 printf("Saldo Bersih     : Rp%.2f\n", pemasukan - pengeluaran);
                 break;
             case 5:

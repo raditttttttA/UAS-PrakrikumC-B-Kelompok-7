@@ -1,4 +1,36 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include "../include/fitur.h"
+
+#ifdef _WIN32
+#include <direct.h>
+#define MKDIR(dir) _mkdir(dir)
+#else
+#include <sys/stat.h>
+#define MKDIR(dir) mkdir(dir, 0777)
+#endif
+
+// Helper pencarian substring tanpa peduli huruf besar/kecil (aman lintas OS)
+static int mengandungKataCaseInsensitive(const char *teks, const char *kataKunci) {
+    if (!teks || !kataKunci || *kataKunci == '\0') return 0;
+
+    size_t lenTeks = strlen(teks);
+    size_t lenKunci = strlen(kataKunci);
+    if (lenKunci > lenTeks) return 0;
+
+    for (size_t i = 0; i <= lenTeks - lenKunci; i++) {
+        size_t j = 0;
+        while (j < lenKunci && tolower((unsigned char)teks[i + j]) == tolower((unsigned char)kataKunci[j])) {
+            j++;
+        }
+        if (j == lenKunci) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 // Fungsi internal untuk memastikan folder 'data/' ada secara otomatis
 static void pastikanFolderAda() {
@@ -9,25 +41,33 @@ void tambahTransaksi(const char *filename) {
     CatatanKeuangan transaksi;
     FILE *file = fopen(filename, "ab"); // Mode append binary
     if (!file) {
-        printf("Gagal membuka file database!\n");
+        printf("[ERROR] Gagal membuka file database!\n");
         return;
     }
+
     transaksi.id = dapatkanIdBerikutnya(filename);
 
-    printf("\n=== TAMBAH TRANSAKSI BARU (Auto ID: #%d) ===\n", transaksi.id);    
-    
+    printf("\n=== TAMBAH TRANSAKSI BARU (Auto ID: #%d) ===\n", transaksi.id);
+
     printf("Masukkan Tanggal (YYYY-MM-DD): ");
-    scanf("%14s", transaksi.tanggal);
-    
-    int pilihanTipe;
-    printf("Pilih Tipe Transaksi:\n  1. Pemasukan\n  2. Pengeluaran\nPilihan (1/2): ");
-    if (scanf("%d", &pilihanTipe) != 1) {
-        printf("[ERROR] Input tidak valid!\n");
-        while (getchar() != '\n'); // Bersihkan buffer
+    if (scanf("%14s", transaksi.tanggal) != 1 || strlen(transaksi.tanggal) < 8) {
+        printf("[ERROR] Format tanggal tidak valid!\n");
+        while (getchar() != '\n');
         fclose(file);
         return;
     }
-    
+    while (getchar() != '\n');
+
+    int pilihanTipe;
+    printf("Pilih Tipe Transaksi:\n  1. Pemasukan\n  2. Pengeluaran\nPilihan (1/2): ");
+    if (scanf("%d", &pilihanTipe) != 1 || (pilihanTipe != 1 && pilihanTipe != 2)) {
+        printf("[ERROR] Pilihan harus 1 atau 2!\n");
+        while (getchar() != '\n');
+        fclose(file);
+        return;
+    }
+    while (getchar() != '\n');
+
     if (pilihanTipe == 1) {
         strcpy(transaksi.tipe, "Pemasukan");
     } else {
@@ -35,19 +75,31 @@ void tambahTransaksi(const char *filename) {
     }
 
     printf("Masukkan Kategori (cth: Makanan/Gaji): ");
-    scanf("%29s", transaksi.kategori);
-    
+    if (scanf("%29s", transaksi.kategori) != 1) {
+        printf("[ERROR] Input kategori tidak valid!\n");
+        while (getchar() != '\n');
+        fclose(file);
+        return;
+    }
+    while (getchar() != '\n');
+
     printf("Masukkan Nominal (Rp): ");
     if (scanf("%lf", &transaksi.nominal) != 1 || transaksi.nominal <= 0) {
         printf("[ERROR] Nominal harus berupa angka positif!\n");
-        while (getchar() != '\n'); // Bersihkan buffer
+        while (getchar() != '\n');
+        fclose(file);
+        return;
+    }
+    while (getchar() != '\n');
+
+    if (fwrite(&transaksi, sizeof(CatatanKeuangan), 1, file) != 1) {
+        printf("[ERROR] Gagal menulis data ke file!\n");
         fclose(file);
         return;
     }
 
-    fwrite(&transaksi, sizeof(CatatanKeuangan), 1, file);
     fclose(file);
-    printf("Berhasil menyimpan transaksi!\n");
+    printf("[SUKSES] Berhasil menyimpan transaksi!\n");
 }
 
 void tampilkanRiwayat(const char *filename) {
@@ -90,7 +142,8 @@ void cariTransaksi(const char *filename, const char *keyword) {
 
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
         // Pencarian aman (case-insensitive atau pencocokan string kategori/tipe)
-        if (strcasestr(transaksi.kategori, keyword) != NULL || strcasestr(transaksi.tipe, keyword) != NULL) {
+        if (mengandungKataCaseInsensitive(transaksi.kategori, keyword) ||
+            mengandungKataCaseInsensitive(transaksi.tipe, keyword)) {
             printf("| %-4d | %-12s | %-15s | %-13s | Rp%12.2f |\n", 
                    transaksi.id, transaksi.tanggal, transaksi.kategori, transaksi.tipe, transaksi.nominal);
             ditemukan++;
