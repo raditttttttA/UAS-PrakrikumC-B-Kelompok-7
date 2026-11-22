@@ -24,4 +24,7 @@ void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *tota
 int dapatkanIdBerikutnya(const char *filename);
 void quickAddTransaksi(const char *filename, const char *tanggal, const char *kategori, const char *tipe, double nominal);
 
+// Fungsi manipulasi struct menggunakan pointer (->) sesuai rubrik penilaian
+void isiDataTransaksi(CatatanKeuangan *t, int id, const char *tanggal, const char *kategori, const char *tipe, double nominal);
+
 #endif

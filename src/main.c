@@ -29,10 +29,11 @@ int main(int argc, char *argv[]) {
                 printf("Gunakan: %s --tambah <Pemasukan/Pengeluaran> <Kategori> <Nominal>\n", argv[0]);
                 return 1;
             }
-            char tglHariIni[15];
+            // Mengambil tanggal hari ini secara otomatis untuk quick-add
+            char tglHariIni[40];
             time_t t = time(NULL);
             struct tm tm = *localtime(&t);
-            sprintf(tglHariIni, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+            snprintf(tglHariIni, sizeof(tglHariIni), "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 
             double nominalInput = atof(argv[4]);
             if (nominalInput <= 0) {
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]) {
         printf("Pilihan Anda: ");
         if (scanf("%d", &pilihan) != 1) {
             printf("[ERROR] Masukkan angka pilihan yang valid!\n");
-            while(getchar() != '\n');
+            while(getchar() != '\n'); // Clear buffer
             continue;
         }
 

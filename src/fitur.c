@@ -12,6 +12,7 @@
 #define MKDIR(dir) mkdir(dir, 0777)
 #endif
 
+// Helper pencarian substring tanpa peduli huruf besar/kecil (aman lintas OS)
 static int mengandungKataCaseInsensitive(const char *teks, const char *kataKunci) {
     if (!teks || !kataKunci || *kataKunci == '\0') return 0;
 
@@ -31,14 +32,34 @@ static int mengandungKataCaseInsensitive(const char *teks, const char *kataKunci
     return 0;
 }
 
-
+// Fungsi internal untuk memastikan folder 'data/' ada secara otomatis
 static void pastikanFolderAda() {
     MKDIR("data");
 }
 
+// Fungsi manipulasi struct CatatanKeuangan menggunakan pointer (->)
+void isiDataTransaksi(CatatanKeuangan *t, int id, const char *tanggal, const char *kategori, const char *tipe, double nominal) {
+    t->id = id;
+
+    // Salin string dengan batas buffer aman
+    strncpy(t->tanggal, tanggal, sizeof(t->tanggal) - 1);
+    t->tanggal[sizeof(t->tanggal) - 1] = '\0';
+
+    strncpy(t->kategori, kategori, sizeof(t->kategori) - 1);
+    t->kategori[sizeof(t->kategori) - 1] = '\0';
+
+    if (strcasecmp(tipe, "pemasukan") == 0 || strstr(tipe, "masuk") != NULL) {
+        strcpy(t->tipe, "Pemasukan");
+    } else {
+        strcpy(t->tipe, "Pengeluaran");
+    }
+
+    t->nominal = nominal;
+}
+
 void tambahTransaksi(const char *filename) {
     CatatanKeuangan transaksi;
-    FILE *file = fopen(filename, "ab"); 
+    FILE *file = fopen(filename, "ab"); // Mode append binary
     if (!file) {
         printf("[ERROR] Gagal membuka file database!\n");
         return;
@@ -211,7 +232,7 @@ void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *tota
     CatatanKeuangan transaksi;
     FILE *file = fopen(filename, "rb");
     
- 
+    // Inisialisasi total pemasukan dan pengeluaran ke 0
     *totalPemasukan = 0;
     *totalPengeluaran = 0;
 
@@ -220,13 +241,13 @@ void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *tota
         return;
     }
 
-
+    // Baca data transaksi satu per satu
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
-    
+        // Cek jika tipe adalah pemasukan (tidak sensitif huruf besar/kecil)
         if (strcasecmp(transaksi.tipe, "Pemasukan") == 0 || strstr(transaksi.tipe, "masuk") != NULL) {
             *totalPemasukan += transaksi.nominal;
         } 
-  
+        // Cek jika tipe adalah pengeluaran (tidak sensitif huruf besar/kecil)
         else if (strcasecmp(transaksi.tipe, "Pengeluaran") == 0 || strstr(transaksi.tipe, "keluar") != NULL) {
             *totalPengeluaran += transaksi.nominal;
         }
@@ -235,6 +256,7 @@ void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *tota
     fclose(file);
 }
 
+// Menghitung ID terakhir + 1 agar ID tetap otomatis
 int dapatkanIdBerikutnya(const char *filename) {
     CatatanKeuangan transaksi;
     FILE *file = fopen(filename, "rb");
@@ -253,6 +275,7 @@ int dapatkanIdBerikutnya(const char *filename) {
     return maxId + 1;
 }
 
+// Quick add (./program --tambah)
 void quickAddTransaksi(const char *filename, const char *tanggal, const char *kategori, const char *tipe, double nominal) {
     CatatanKeuangan transaksi;
     FILE *file = fopen(filename, "ab");
@@ -261,21 +284,10 @@ void quickAddTransaksi(const char *filename, const char *tanggal, const char *ka
         return;
     }
 
-    transaksi.id = dapatkanIdBerikutnya(filename);
+    int idBaru = dapatkanIdBerikutnya(filename);
 
-    strncpy(transaksi.tanggal, tanggal, sizeof(transaksi.tanggal) - 1);
-    transaksi.tanggal[sizeof(transaksi.tanggal) - 1] = '\0';
-    
-    strncpy(transaksi.kategori, kategori, sizeof(transaksi.kategori) - 1);
-    transaksi.kategori[sizeof(transaksi.kategori) - 1] = '\0';
-    
-    if (strcasecmp(tipe, "pemasukan") == 0) {
-        strcpy(transaksi.tipe, "Pemasukan");
-    } else {
-        strcpy(transaksi.tipe, "Pengeluaran");
-    }
-    
-    transaksi.nominal = nominal;
+    // Memanipulasi struct menggunakan pointer (->) lewat fungsi isiDataTransaksi
+    isiDataTransaksi(&transaksi, idBaru, tanggal, kategori, tipe, nominal);
 
     fwrite(&transaksi, sizeof(CatatanKeuangan), 1, file);
     fclose(file);
