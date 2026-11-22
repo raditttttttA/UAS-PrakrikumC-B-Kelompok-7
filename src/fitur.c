@@ -56,9 +56,10 @@ void cariTransaksi(const char *filename, const char *keyword) {
 
     printf("\n=== HASIL PENCARIAN: '%s' ===\n", keyword);
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
-        if (strcmp(transaksi.kategori, keyword) == 0 || strcmp(transaksi.tipe, keyword) == 0) {
-            printf("ID: %d | Tanggal: %s | %s | Rp%.2f\n", 
-                   transaksi.id, transaksi.tanggal, transaksi.kategori, transaksi.nominal);
+        // Cocokkan kategori atau tipe tanpa sensitif huruf besar/kecil
+        if (strcasecmp(transaksi.kategori, keyword) == 0 || strcasecmp(transaksi.tipe, keyword) == 0) {
+            printf("ID: %d | Tanggal: %s | %s | %s | Rp%.2f\n", 
+                   transaksi.id, transaksi.tanggal, transaksi.kategori, transaksi.tipe, transaksi.nominal);
             ditemukan = 1;
         }
     }
@@ -98,18 +99,27 @@ void hitungSaldoTotal(const char *filename, double *totalPemasukan, double *tota
     CatatanKeuangan transaksi;
     FILE *file = fopen(filename, "rb");
     
+    // Inisialisasi total pemasukan dan pengeluaran ke 0
     *totalPemasukan = 0;
     *totalPengeluaran = 0;
 
-    if (!file) return;
+    if (!file) {
+        printf("Belum ada data keuangan atau file belum dibuat.\n");
+        return;
+    }
 
+    // Baca data transaksi satu per satu
     while (fread(&transaksi, sizeof(CatatanKeuangan), 1, file) == 1) {
-        if (strcmp(transaksi.tipe, "Pemasukan") == 0) {
+        // Cek jika tipe adalah pemasukan (tidak sensitif huruf besar/kecil)
+        if (strcasecmp(transaksi.tipe, "Pemasukan") == 0 || strstr(transaksi.tipe, "masuk") != NULL) {
             *totalPemasukan += transaksi.nominal;
-        } else if (strcmp(transaksi.tipe, "Pengeluaran") == 0) {
+        } 
+        // Cek jika tipe adalah pengeluaran (tidak sensitif huruf besar/kecil)
+        else if (strcasecmp(transaksi.tipe, "Pengeluaran") == 0 || strstr(transaksi.tipe, "keluar") != NULL) {
             *totalPengeluaran += transaksi.nominal;
         }
     }
+
     fclose(file);
 }
 
