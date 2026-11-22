@@ -29,7 +29,6 @@ int main(int argc, char *argv[]) {
                 printf("Gunakan: %s --tambah <Pemasukan/Pengeluaran> <Kategori> <Nominal>\n", argv[0]);
                 return 1;
             }
-            // Mengambil tanggal hari ini secara otomatis untuk quick-add
             char tglHariIni[15];
             time_t t = time(NULL);
             struct tm tm = *localtime(&t);
@@ -62,7 +61,7 @@ int main(int argc, char *argv[]) {
         printf("Pilihan Anda: ");
         if (scanf("%d", &pilihan) != 1) {
             printf("[ERROR] Masukkan angka pilihan yang valid!\n");
-            while(getchar() != '\n'); // Clear buffer
+            while(getchar() != '\n');
             continue;
         }
 
