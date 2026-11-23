@@ -29,7 +29,6 @@ int main(int argc, char *argv[]) {
                 printf("Gunakan: %s --tambah <Pemasukan/Pengeluaran> <Kategori> <Nominal>\n", argv[0]);
                 return 1;
             }
-            // Mengambil tanggal hari ini secara otomatis untuk quick-add
             char tglHariIni[40];
             time_t t = time(NULL);
             struct tm tm = *localtime(&t);
