@@ -47,7 +47,7 @@ Mode argumen CLI:
 ./program.exe --cari <kategori/tipe>
 
 - Tambah cepat:
-./program.exe --tambah <YYYY-MM-DD> <Kategori> <Tipe> <Nominal>
+./program.exe --tambah <Kategori> <Tipe> <Nominal>
 
 Contoh Output Program
 
